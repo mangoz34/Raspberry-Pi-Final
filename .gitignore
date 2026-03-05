@@ -1,3 +1,22 @@
-/.venv
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.cache/
 
+# PyCharm / IntelliJ Config
+.idea/
+*.iml
+
+# MacOS Dump
+.DS_Store
+Thumbs.db
+
+# Virtual Env
+venv/
+dashboard_env/
+.env
+
+# Private Files
+# config.py
 __secret_key__
