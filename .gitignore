@@ -7,13 +7,15 @@ __pycache__/
 # PyCharm / IntelliJ Config
 .idea/
 *.iml
+.cache
+./backend/.cache
 
 # MacOS Dump
 .DS_Store
 Thumbs.db
 
 # Virtual Env
-venv/
+.venv
 dashboard_env/
 .env
 
