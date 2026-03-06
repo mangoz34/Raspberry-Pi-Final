@@ -211,5 +211,5 @@ if __name__ == "__main__":
 
 
     window = DashboardWindow()
-    window.show()
+    window.showFullScreen()
     sys.exit(app.exec())
