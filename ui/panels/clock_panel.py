@@ -34,7 +34,7 @@ class FlipDigit(QWidget):
 
     def __init__(self, text="00"):
         super().__init__()
-        self.setFixedSize(160, 155)
+        self.setFixedSize(170, 155)
 
         self.current_text = text
         self.next_text = text
