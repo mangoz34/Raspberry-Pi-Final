@@ -34,8 +34,7 @@ class FlipDigit(QWidget):
 
     def __init__(self, text="00"):
         super().__init__()
-        # 🎯 調整點 1：大幅降低高度 (從 185 降到 155)，保持寬度 135
-        self.setFixedSize(135, 155)
+        self.setFixedSize(150, 155)
 
         self.current_text = text
         self.next_text = text
@@ -147,9 +146,7 @@ class ClockPanel(QWidget):
         self.weather_worker.start()
 
     def _load_background_image(self):
-        """程式啟動時，從硬碟讀取圖片到記憶體 (零 I/O 負擔)"""
         if getattr(config, 'SET_BACKGROUND_IMAGE', 0) == 1:
-            # 使用絕對路徑，確保在哪裡執行都不會找不到圖
             img_name = getattr(config, 'BACKGROUND_IMAGE_PATH', 'assets/clock_bg.png')
             img_path = os.path.join(BASE_DIR, img_name)
 
@@ -160,7 +157,6 @@ class ClockPanel(QWidget):
                 self.logger.error(f"Cannot load background image from: {img_path}")
 
     def resizeEvent(self, event):
-        """🎯 2. 新增：當面板大小確定時，將圖片進行高品質縮放並快取"""
         super().resizeEvent(event)
         if self.raw_bg_pixmap and not self.raw_bg_pixmap.isNull():
             self.cached_bg_pixmap = self.raw_bg_pixmap.scaled(
@@ -171,7 +167,6 @@ class ClockPanel(QWidget):
 
     def _setup_ui(self):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-        # 移除原本 CSS 的 background-color，交給 paintEvent 全權處理背景
         self.setStyleSheet("QLabel { background: transparent; }")
 
         main_layout = QVBoxLayout(self)
