@@ -123,7 +123,7 @@ class PerformanceTab(QWidget):
         specs = [
             ("BOARD", "Raspberry Pi 4B"),
             ("CPU", "Cortex-A72 (ARMv8)"),
-            ("OS", f"{platform.system()}"),
+            ("OS", f"{platform.system()} {platform.release()}"),
             ("IP", "127.0.0.1"),
             ("DISK", "0.0 GB / 0.0 GB")
         ]
@@ -136,7 +136,7 @@ class PerformanceTab(QWidget):
             k_lbl.setStyleSheet("color: #888888;")
 
             v_lbl = QLabel(default_val)
-            v_lbl.setFont(QFont("Arial", 15, QFont.Weight.Medium))
+            v_lbl.setFont(QFont("Arial", 14, QFont.Weight.Medium))
             v_lbl.setStyleSheet("color: #E0E0E0;")
             v_lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
