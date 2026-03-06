@@ -4,6 +4,7 @@ import time
 import logging
 import platform
 import psutil
+import socket
 
 # Dynamically add the project root to sys.path so we can import config.py
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -85,11 +86,23 @@ class HardwareCollector:
 
         return round(tx_speed, 2), round(rx_speed, 2)
 
+    def get_ip_address(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(('8.8.8.8', 1))
+            ip = s.getsockname()[0]
+        except Exception:
+            ip = '127.0.0.1'
+        finally:
+            s.close()
+        return ip
+
     def fetch_system_stats(self):
         """
         Fetch all hardware statistics and return them as a standardized dictionary for UI.
         """
         tx_kbps, rx_kbps = self._get_network_speed()
+        ip_address = self.get_ip_address()
         mem = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
 
@@ -101,6 +114,9 @@ class HardwareCollector:
             "mem_used_gb": round(mem.used / (1024 ** 3), 2),
             "mem_total_gb": round(mem.total / (1024 ** 3), 2),
             "disk_usage_percent": disk.percent,
+            "ip_address": ip_address,
+            "disk_used_gb": round(disk.used / (1024 ** 3), 1),
+            "disk_total_gb": round(disk.total / (1024 ** 3), 1),
             "net_tx_kbps": tx_kbps,
             "net_rx_kbps": rx_kbps
         }

@@ -123,7 +123,7 @@ class PerformanceTab(QWidget):
         specs = [
             ("BOARD", "Raspberry Pi 4B"),
             ("CPU", "Cortex-A72 (ARMv8)"),
-            ("OS", f"{platform.system()} {platform.release()}"),
+            ("OS", f"{platform.system()}"),
             ("IP", "127.0.0.1"),
             ("DISK", "0.0 GB / 0.0 GB")
         ]
@@ -147,10 +147,7 @@ class PerformanceTab(QWidget):
 
         center_layout.addLayout(sys_info_layout)
 
-        # 🎯 修改點 2：縮小 Spacing，把網路速率往上拉，填補空白
         center_layout.addSpacing(15)
-
-        # 2. Network Stats Block
         net_layout = QHBoxLayout()
 
         def create_net_box(title, color):
