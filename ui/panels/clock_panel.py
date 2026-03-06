@@ -34,7 +34,7 @@ class FlipDigit(QWidget):
 
     def __init__(self, text="00"):
         super().__init__()
-        self.setFixedSize(150, 155)
+        self.setFixedSize(160, 155)
 
         self.current_text = text
         self.next_text = text
@@ -87,8 +87,8 @@ class FlipDigit(QWidget):
                 self._draw_half(painter, self.next_text, is_top=False, scale=scale)
 
         # 畫中間分割線
-        painter.setPen(QPen(QColor("#121212"), 3))
-        # painter.setPen(QPen(QColor(255, 255, 255, 80), 2))
+        # painter.setPen(QPen(QColor("#121212"), 3))
+        painter.setPen(QPen(QColor(255, 255, 255, 80), 2))
         painter.drawLine(0, mid_y, w, mid_y)
         painter.end()
 
@@ -125,7 +125,6 @@ class ClockPanel(QWidget):
         self.setFixedWidth(770)
         self.logger = logging.getLogger("ClockPanel")
 
-        # 🎯 1. 新增：在初始化時只讀取一次圖片並放入記憶體
         self.raw_bg_pixmap = None
         self.cached_bg_pixmap = None
         self._load_background_image()

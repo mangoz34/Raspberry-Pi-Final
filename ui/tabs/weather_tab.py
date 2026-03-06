@@ -109,7 +109,7 @@ class WeatherTab(QWidget):
         right_info_layout.setSpacing(0)
 
         self.current_temp_label = QLabel("--°")
-        self.current_temp_label.setFont(QFont("Arial", 95, QFont.Weight.Bold))
+        self.current_temp_label.setFont(QFont("Arial", 60, QFont.Weight.Bold))
         self.current_temp_label.setStyleSheet("color: white; background: transparent;")
         self.current_temp_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom)
 
@@ -176,7 +176,7 @@ class WeatherTab(QWidget):
         lbl_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         lbl_icon = QLabel(icon)
-        lbl_icon.setFont(QFont("Arial", 42))
+        lbl_icon.setFont(QFont("Arial", 36))
         lbl_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         lbl_temp = QLabel(temp)
@@ -232,7 +232,6 @@ class WeatherTab(QWidget):
         if daily_max != "--":
             self.high_low_label.setText(f"↑ {int(round(daily_max))}°   ↓ {int(round(daily_min))}°")
 
-        # --- 3. 🎯 更新下方「每 3 小時」預報陣列 ---
         hourly_data = weather_data.get("hourly", {})
         if hourly_data and "time" in hourly_data:
             times = hourly_data["time"]
@@ -263,7 +262,6 @@ class WeatherTab(QWidget):
                     lbl_temp.setText(f"{int(round(temps[idx]))}°")
                     lbl_sub.setText(f"{pops[idx]}%")
 
-        # --- 4. 🎯 更新下方「未來 7 天」預報陣列 ---
         daily_data = weather_data.get("daily", {})
         if daily_data and "time" in daily_data:
             times = daily_data["time"]
@@ -271,16 +269,13 @@ class WeatherTab(QWidget):
             min_temps = daily_data["min"]
             codes = daily_data["code"]
 
-            # 一週預報的長度最多就是 7 天
             for i in range(min(7, len(times))):
                 dt = datetime.fromisoformat(times[i])
                 day_str = dt.strftime("%a")  # 抓取星期縮寫 (e.g., "Mon", "Tue")
 
-                # 將第一天標示為「今天」
                 if i == 0:
                     day_str = "Today"
 
-                # 取出對應的 4 個 QLabel 並填值
                 lbl_title, lbl_icon, lbl_temp, lbl_sub = self.daily_columns[i]
 
                 lbl_title.setText(day_str)
