@@ -121,7 +121,7 @@ class PerformanceTab(QWidget):
 
         self.sys_labels = {}
         specs = [
-            ("BOARD", "Raspberry Pi 4B"),
+            ("MODEL", "Raspberry Pi 4B"),
             ("CPU", "Cortex-A72 (ARMv8)"),
             ("OS", f"{platform.system()} {platform.release()}"),
             ("IP", "127.0.0.1"),
