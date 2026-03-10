@@ -55,9 +55,9 @@ class WeatherTab(QWidget):
         elif code in [45, 48]:
             return "☁️"
         elif code in [51, 53, 55, 56, 57]:
-            return "🌧️A"
+            return "🌧"
         elif code in [61, 63, 65, 66, 67]:
-            return "🌧️B"
+            return "🌧"
         elif code in [71, 73, 75, 77]:
             return "❄️"
         elif code in [80, 81, 82]:
