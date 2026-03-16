@@ -127,7 +127,7 @@ class HardwareCollector:
         return stats
 
 
-# Unit test block
+# Unit test
 if __name__ == '__main__':
     collector = HardwareCollector()
     print("--- Testing fetch_system_stats ---")

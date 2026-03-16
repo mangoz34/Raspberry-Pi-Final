@@ -7,21 +7,19 @@ from PyQt6.QtCore import Qt, QPoint, QTimer, QThread, pyqtSignal
 
 import config
 
-# 載入後端 API 模組
+# backend API
 from backend.hardware_collector import HardwareCollector
 from backend.spotify_client import SpotifyClient
 from backend.weather_client import WeatherClient
 
-# 載入前端 UI 模組
+# Frontend UI
 from ui.panels.clock_panel import ClockPanel
 from ui.tabs.performance_tab import PerformanceTab
 from ui.tabs.weather_tab import WeatherTab
 from ui.tabs.spotify_tab import SpotifyTab
 
 
-# ==========================================
-# BACKGROUND WORKERS (確保 UI 不卡頓)
-# ==========================================
+# BACKGROUND WORKERS
 class HardwareWorker(QThread):
     data_updated = pyqtSignal(dict)
 
@@ -59,9 +57,8 @@ class FullWeatherWorker(QThread):
             data["condition_desc"] = self.client.get_weather_desc(code)
         self.data_updated.emit(data)
 
-# ==========================================
+
 # MAIN DASHBOARD WINDOW
-# ==========================================
 class DashboardWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -145,22 +142,20 @@ class DashboardWindow(QWidget):
         main_layout.addWidget(self.right_stack)
 
     def _start_background_tasks(self):
-        """啟動所有背景資料抓取任務"""
-        # --- 硬體監控 (每 2 秒更新一次) ---
         self.hw_worker = HardwareWorker()
         self.hw_worker.data_updated.connect(self.perf_tab.update_ui)
         self.hw_timer = QTimer(self)
         self.hw_timer.timeout.connect(self.hw_worker.start)
         self.hw_timer.start(2000)
-        self.hw_worker.start()  # 立即觸發第一次
+        self.hw_worker.start()
 
-        # --- Spotify 狀態 (每 5 秒更新一次) ---
+        # Spotify state
         self.sp_worker = SpotifyWorker()
         self.sp_worker.data_updated.connect(self.spotify_tab.update_ui)
         self.sp_timer = QTimer(self)
         self.sp_timer.timeout.connect(self.sp_worker.start)
         self.sp_timer.start(5000)
-        self.sp_worker.start()  # 立即觸發第一次
+        self.sp_worker.start()
         self.spotify_tab.track_ended.connect(self._force_spotify_update)
         self.spotify_tab.next_track.connect(self._handle_next_track)
         self.spotify_tab.prev_track.connect(self._handle_prev_track)
@@ -171,11 +166,9 @@ class DashboardWindow(QWidget):
         self.weather_timer = QTimer(self)
         self.weather_timer.timeout.connect(self.weather_worker.start)
         self.weather_timer.start(900000)
-        self.weather_worker.start()  # 立即觸發第一次
+        self.weather_worker.start()
 
-    # ==========================================
-    # GESTURE CONTROLS (左右滑動切換面板)
-    # ==========================================
+
     def mousePressEvent(self, event):
         self.swipe_start_pos = event.pos()
         super().mousePressEvent(event)
@@ -183,16 +176,13 @@ class DashboardWindow(QWidget):
     def mouseReleaseEvent(self, event):
         diff_x = event.pos().x() - self.swipe_start_pos.x()
 
-        # 設定滑動閾值，避免誤觸 (大於 100px 才算滑動)
         current_index = self.right_stack.currentIndex()
         max_index = self.right_stack.count() - 1
 
         if diff_x < -100:
-            # 往左滑 (Swipe Left) -> 下一頁
             if current_index < max_index:
                 self.right_stack.setCurrentIndex(current_index + 1)
         elif diff_x > 100:
-            # 往右滑 (Swipe Right) -> 上一頁
             if current_index > 0:
                 self.right_stack.setCurrentIndex(current_index - 1)
 

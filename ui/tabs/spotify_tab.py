@@ -3,11 +3,9 @@ import os
 import logging
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QProgressBar
 from PyQt6.QtGui import QPixmap, QFont, QPainter, QPainterPath
-# 🎯 補上了 QEvent 和 QPoint 方便處理手勢
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QUrl, QEvent, QPoint
 from PyQt6.QtNetwork import QNetworkAccessManager, QNetworkRequest
 
-# Dynamically add the project root to sys.path so we can import config.py
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if BASE_DIR not in sys.path:
     sys.path.append(BASE_DIR)
@@ -19,7 +17,6 @@ logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(name)s - %(levelnam
 
 
 class SpotifyTab(QWidget):
-    # 🎯 新增控制相關的訊號，用來發送給 main.py 執行真實的 API 呼叫
     track_ended = pyqtSignal()
     next_track = pyqtSignal()
     prev_track = pyqtSignal()
@@ -30,21 +27,17 @@ class SpotifyTab(QWidget):
         self.logger = logging.getLogger("SpotifyTab")
         self.current_cover_url = ""
 
-        # 播放狀態變數
         self.current_progress_ms = 0
         self.current_duration_ms = 0
         self.is_playing = False
 
-        # 紀錄觸控位置的變數
         self.touch_start_pos = None
 
-        # 非同步下載圖片管理器
         self.network_manager = QNetworkAccessManager(self)
         self.network_manager.finished.connect(self._on_image_downloaded)
 
         self._setup_ui()
 
-        # 建立本地進度計時器 (每 1000ms 跑一次)
         self.progress_timer = QTimer(self)
         self.progress_timer.timeout.connect(self._increment_progress)
 
@@ -147,7 +140,6 @@ class SpotifyTab(QWidget):
                 diff_x = event.pos().x() - self.touch_start_pos.x()
                 diff_y = event.pos().y() - self.touch_start_pos.y()
 
-                # 判斷是否為滑動 (X軸位移大於 50 像素)
                 if abs(diff_x) > 50:
                     if diff_x > 0:
                         self.logger.info("Swipe Right on Cover -> Next Track")
@@ -156,18 +148,16 @@ class SpotifyTab(QWidget):
                         self.logger.info("Swipe Left on Cover -> Prev Track")
                         self.next_track.emit()
 
-                # 判斷是否為單純點擊 (位移極小)
                 elif abs(diff_x) < 10 and abs(diff_y) < 10:
                     self.logger.info("Tapped on Cover -> Toggle Playback")
 
-                    # 💡 本地先行：立刻反轉播放狀態並控制進度條，不用等 API
                     self.is_playing = not self.is_playing
                     if self.is_playing:
                         self.progress_timer.start(1000)
                     else:
                         self.progress_timer.stop()
 
-                    self.toggle_playback.emit()  # 通知後端真的去暫停/播放
+                    self.toggle_playback.emit()
 
                 self.touch_start_pos = None
                 return True

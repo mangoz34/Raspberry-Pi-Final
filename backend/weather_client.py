@@ -38,7 +38,6 @@ class WeatherClient:
 
     def fetch_current_weather(self):
         """Fetch current weather using Open-Meteo."""
-        # 如果還沒取得經緯度，先嘗試定位
         if self.lat is None or self.lon is None:
             if not self.fetch_location_by_ip():
                 return {"error": "Location unknown"}
@@ -92,7 +91,6 @@ class WeatherClient:
                 return {"error": "Location unknown"}
 
         try:
-            # 組合出同時抓取 current, hourly, daily 的超長 API 網址
             url = (f"https://api.open-meteo.com/v1/forecast?"
                    f"latitude={self.lat}&longitude={self.lon}&"
                    f"current=temperature_2m,relative_humidity_2m,weather_code&"
@@ -103,7 +101,6 @@ class WeatherClient:
             response = requests.get(url, timeout=5)
             data = response.json()
 
-            # 整理回傳的字典，供 UI 直接使用
             result = {
                 "city": self.city,
                 "current": {

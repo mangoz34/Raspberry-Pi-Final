@@ -86,7 +86,6 @@ class FlipDigit(QWidget):
                 scale = (self.anim_progress - 0.5) * 2
                 self._draw_half(painter, self.next_text, is_top=False, scale=scale)
 
-        # 畫中間分割線
         # painter.setPen(QPen(QColor("#121212"), 3))
         painter.setPen(QPen(QColor(255, 255, 255, 80), 2))
         painter.drawLine(0, mid_y, w, mid_y)
@@ -225,15 +224,12 @@ class ClockPanel(QWidget):
         path.addRoundedRect(QRectF(self.rect()), 20, 20)
         painter.setClipPath(path)
 
-        # 直接從記憶體拿出處理好的 cached_bg_pixmap 來畫
         if getattr(config, 'SET_BACKGROUND_IMAGE', 0) == 1 and self.cached_bg_pixmap:
             x_offset = (self.cached_bg_pixmap.width() - self.width()) // 2
             y_offset = (self.cached_bg_pixmap.height() - self.height()) // 2
 
-            # 將記憶體中的圖片畫上去 (耗時接近 0 毫秒)
             painter.drawPixmap(0, 0, self.cached_bg_pixmap, x_offset, y_offset, self.width(), self.height())
 
-            # 疊加半透明遮罩
             painter.fillPath(path, QColor(0, 0, 0, 0))
         else:
             painter.fillPath(path, QColor("#121212"))

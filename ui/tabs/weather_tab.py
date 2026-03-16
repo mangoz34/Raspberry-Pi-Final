@@ -29,25 +29,23 @@ class WeatherTab(QWidget):
         self._setup_ui()
 
     def _get_gradient_by_code(self, code):
-        """根據 WMO 天氣代碼，回傳對應的高質感漸層 CSS"""
-        # 晴天 (Clear)
+
         if code == 0:
             return "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4A90E2, stop:1 #1C5898)"
-        # 多雲/起霧 (Cloudy/Fog) - 使用原本的莫蘭迪藍
+
         elif code in [1, 2, 3, 45, 48]:
             return "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #586E8C, stop:1 #3B4D66)"
-        # 下雪 (Snow)
+
         elif code in [71, 73, 75, 77, 85, 86]:
             return "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #7597B0, stop:1 #4E6E8A)"
-        # 下雨/雷雨 (Rain/Storm)
+
         elif code in [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99]:
             return "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2C3E50, stop:1 #1A252F)"
-        # 預設 (Default)
+
         else:
             return "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #586E8C, stop:1 #3B4D66)"
 
     def _get_icon_by_code(self, code):
-        """將 WMO 天氣代碼轉換為 UI 顯示的 Emoji 圖示"""
         if code == 0:
             return "☀️"
         elif code in [1, 2, 3]:
@@ -76,7 +74,6 @@ class WeatherTab(QWidget):
         main_layout.setContentsMargins(40, 30, 40, 30)
 
         self.card_frame = QFrame()
-        # 初始背景設為莫蘭迪藍
         self.card_frame.setStyleSheet("""
             QFrame {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #586E8C, stop:1 #3B4D66);
@@ -86,9 +83,8 @@ class WeatherTab(QWidget):
         card_layout = QVBoxLayout(self.card_frame)
         card_layout.setContentsMargins(50, 40, 50, 30)
 
-        # ==========================================
+
         # TOP SECTION: Current Weather Info
-        # ==========================================
         top_layout = QHBoxLayout()
 
         left_info_layout = QVBoxLayout()
@@ -134,9 +130,7 @@ class WeatherTab(QWidget):
         line.setFixedHeight(1)
         card_layout.addWidget(line)
 
-        # ==========================================
         # BOTTOM SECTION: Stacked Widget for Hourly/Daily
-        # ==========================================
         self.stacked_widget = QStackedWidget()
         self.stacked_widget.setStyleSheet("background: transparent;")
 
@@ -148,7 +142,7 @@ class WeatherTab(QWidget):
         for _ in range(7):
             col_layout, lbls = self._create_forecast_column("--", "☁️", "--°", "--%")
             self.layout_hourly.addLayout(col_layout)
-            self.hourly_columns.append(lbls)  # 儲存 label 參考以便日後更新
+            self.hourly_columns.append(lbls)
         self.stacked_widget.addWidget(self.page_hourly)
 
         # Page 1: Daily Forecast
@@ -159,7 +153,7 @@ class WeatherTab(QWidget):
         for _ in range(7):
             col_layout, lbls = self._create_forecast_column("--", "☁️", "--°", "--°")
             self.layout_daily.addLayout(col_layout)
-            self.daily_columns.append(lbls)  # 儲存 label 參考以便日後更新
+            self.daily_columns.append(lbls)
         self.stacked_widget.addWidget(self.page_daily)
 
         card_layout.addWidget(self.stacked_widget)
@@ -194,19 +188,15 @@ class WeatherTab(QWidget):
         col.addWidget(lbl_temp)
         col.addWidget(lbl_sub)
 
-        # 回傳 layout 以及裡面的 labels，方便後續 update_ui 更新數值
         return col, (lbl_title, lbl_icon, lbl_temp, lbl_sub)
 
-    # ==========================================
+
     # DATA UPDATE LOGIC
-    # ==========================================
     def update_ui(self, weather_data):
-        """接收從 backend 傳來的天氣資料，動態更新所有 UI 數值與背景"""
         if "error" in weather_data and weather_data["error"]:
             self.condition_label.setText("Offline")
             return
 
-        # --- 1. 動態切換背景漸層色 ---
         current_code = weather_data.get("current", {}).get("code", 1)
         gradient_css = self._get_gradient_by_code(current_code)
         self.card_frame.setStyleSheet(f"""
@@ -216,7 +206,6 @@ class WeatherTab(QWidget):
             }}
         """)
 
-        # --- 2. 更新上方主要資訊 ---
         condition_text = weather_data.get("condition_desc", "Cloudy")
         city = weather_data.get("city", "Unknown")
         humidity = weather_data.get("current", {}).get("humidity", "--")
@@ -236,10 +225,9 @@ class WeatherTab(QWidget):
         if hourly_data and "time" in hourly_data:
             times = hourly_data["time"]
             temps = hourly_data["temp"]
-            pops = hourly_data["pop"]  # 降雨機率
+            pops = hourly_data["pop"]
             codes = hourly_data["code"]
 
-            # 智慧尋找：找出大於或等於「現在時刻」的資料點索引
             now = datetime.now()
             start_idx = 0
             for idx, t_str in enumerate(times):
@@ -247,14 +235,12 @@ class WeatherTab(QWidget):
                     start_idx = idx
                     break
 
-            # 將 7 根柱子的 UI 依序填入 (每次跳 3 小時)
             for i in range(7):
                 idx = start_idx + (i * 3)
                 if idx < len(times):
                     dt = datetime.fromisoformat(times[idx])
-                    hour_str = dt.strftime("%H")  # 抓取小時數字 (e.g., "12", "15")
+                    hour_str = dt.strftime("%H")
 
-                    # 從 init 存起來的 self.hourly_columns 取出對應的 4 個 QLabel
                     lbl_title, lbl_icon, lbl_temp, lbl_sub = self.hourly_columns[i]
 
                     lbl_title.setText(hour_str)
@@ -271,7 +257,7 @@ class WeatherTab(QWidget):
 
             for i in range(min(7, len(times))):
                 dt = datetime.fromisoformat(times[i])
-                day_str = dt.strftime("%a")  # 抓取星期縮寫 (e.g., "Mon", "Tue")
+                day_str = dt.strftime("%a")
 
                 if i == 0:
                     day_str = "Today"
@@ -283,9 +269,7 @@ class WeatherTab(QWidget):
                 lbl_temp.setText(f"{int(round(max_temps[i]))}°")
                 lbl_sub.setText(f"{int(round(min_temps[i]))}°")
 
-    # ==========================================
     # GESTURE CONTROLS
-    # ==========================================
     def wheelEvent(self, event):
         delta = event.angleDelta().y()
         if delta > 0:
@@ -301,7 +285,6 @@ class WeatherTab(QWidget):
         diff_y = end_pos.y() - self.swipe_start_pos.y()
         diff_x = end_pos.x() - self.swipe_start_pos.x()
 
-        # 判斷是垂直滑動還是水平滑動
         if abs(diff_y) > abs(diff_x):
             if diff_y > 50:
                 self.stacked_widget.setCurrentIndex(0)
@@ -325,7 +308,6 @@ if __name__ == "__main__":
     window.resize(1150, 480)
     window.show()
 
-    # 模擬測試：每 2 秒隨機切換一種天氣狀態，讓你預覽背景顏色的變換！
     test_codes = [0, 2, 61, 71]  # 晴天, 多雲, 下雨, 下雪
     desc_map = {0: "Sunny", 2: "Cloudy", 61: "Rainy", 71: "Snowy"}
 
@@ -344,9 +326,8 @@ if __name__ == "__main__":
 
     timer = QTimer()
     timer.timeout.connect(simulate_weather_change)
-    timer.start(2000)  # 每 2 秒跳換一次
+    timer.start(2000)
 
-    # 初始呼叫一次
     simulate_weather_change()
 
     sys.exit(app.exec())
